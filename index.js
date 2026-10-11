@@ -3254,6 +3254,7 @@ function buildConfigPanel(guildId) {
       new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("panel:servers").setLabel("Servidores autorizados").setEmoji({ name: "60581", id: "1557204878001176586" }).setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId("panel:fruit_roles").setLabel("Cargos das frutas").setEmoji(fruitEmojiObject("Dragon")).setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("panel:server_channels").setLabel("Canais e logs").setEmoji("🧾").setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId("panel:main").setLabel("Voltar").setEmoji({ name: "60578", id: "1557204872648982579" }).setStyle(ButtonStyle.Secondary)
       )
     );
@@ -3469,8 +3470,6 @@ const commands = [
   new SlashCommandBuilder().setName("painel").setDescription("Abrir o painel central do Astral Stock"),
   // Stock tools
   new SlashCommandBuilder().setName("refresh-stock").setDescription("Fetch and publish the current stock")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-  new SlashCommandBuilder().setName("test-source").setDescription("Testa a fonte pública e mostra o stock consultado")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
   new SlashCommandBuilder().setName("stock-history").setDescription("Show recent stock changes")
     .setIntegrationTypes([0, 1]).setContexts([0]),
@@ -5146,6 +5145,10 @@ client.on("interactionCreate", async interaction => {
       else if (action === "config") panel = buildConfigPanel(interaction.guildId);
       else if (action === "fruit_roles") panel = buildFruitAdminPanel(interaction.guildId);
       else if (action === "servers") panel = buildServerAdminPanel();
+      else if (action === "server_channels") {
+        await interaction.reply({ ...guildSettings.buildPanel(interaction.guild), ephemeral: true });
+        return;
+      }
       else return;
 
       await interaction.update(panel);
@@ -5843,94 +5846,6 @@ client.on("interactionCreate", async interaction => {
     } catch (error) {
       console.error("Erro no /ia:", error);
       await interaction.editReply(uiEmoji("error", "<:offline:1557204568432185454>") + (error.message || "Não consegui falar com a IA agora."));
-    }
- } else if (interaction.commandName === "test-source") {
-    if (!(await isBotOwner(interaction.user.id))) {
-      await commandReply(interaction, {
-        content: uiEmoji("error", "<:offline:1557204568432185454>") + " Apenas o dono do bot pode testar a fonte pública.",
-        ephemeral: true
-      });
-      return;
-    }
-
-    await interaction.deferReply({ ephemeral: true });
-    try {
-      const result = await testPublicStockSource();
-      const normalNames = result.normal.map(item => fruitEmoji(item) + " " + safeName(item)).join(", ");
-      const mirageNames = result.mirage.map(item => fruitEmoji(item) + " " + safeName(item)).join(", ");
-      const message = [
-        "## <:online:1557204563675848814> TESTE DA FONTE PÚBLICA",
-        "**Resultado:** Fonte funcionando, stock consultado com sucesso.",
-        "**Fonte usada:** " + result.sourceUrl,
-        "**Normal (" + result.normal.length + "):** " + normalNames,
-        "**Mirage (" + result.mirage.length + "):** " + mirageNames,
-        "",
-        "-# Teste direto, sem usar o cache, sem chamar a API paga e sem alterar o stock salvo."
-      ].join("\n");
-
-      console.log("[STOCK TEST] Resultado enviado ao dono. Fonte:", result.sourceUrl);
-      await interaction.editReply({ content: message, allowedMentions: { parse: [] } });
-    } catch (error) {
-      console.error("[STOCK TEST] Nenhuma fonte pública funcionou:", error.message || error);
-      await interaction.editReply({
-        content: uiEmoji("error", "<:offline:1557204568432185454>") + " **Teste da fonte falhou.**\n" + String(error.message || error).slice(0, 1600) + "\n\n-# Nenhum stock foi alterado e nenhuma API paga foi consultada.",
-        allowedMentions: { parse: [] }
-      });
-    }
- } else if (interaction.commandName === "test-stock") {
-    const lines = ALL_FRUITS.map(name => {
-      const emoji = fruitEmoji({ name });
-      const price = savedBeliPrice(name);
-      const priceText = price != null
-        ? APPLICATION_UI_EMOJIS.beli + " \`" + Number(price).toLocaleString("en-US") + "\`"
-        : APPLICATION_UI_EMOJIS.beli + " \`Valor não cadastrado\`";
-      const robuxPrice = PERMANENT_ROBUX_PRICES[fruitKey(name)];
-      const robuxText = robuxPrice != null ? " | " + Number(robuxPrice).toLocaleString("en-US") + " " + APPLICATION_UI_EMOJIS.robux : "";
-      return emoji + " **" + name + "** | " + priceText + robuxText;
-    });
-    const testText = [
-      "# " + APPLICATION_FRUIT_EMOJIS.dragon + " Blox Fruits",
-      "",
-      ...lines,
-      "",
-      APPLICATION_UI_EMOJIS.clock + " **Clock test**",
-      APPLICATION_UI_EMOJIS.robux + " **Robux** 2,400"
-    ].join("\n");
-
-    // Divide o teste em páginas para nunca ultrapassar os limites de componentes/mensagem do Discord.
-    const maxChars = 3500;
-    const pages = [];
-    let current = "";
-
-    for (const line of testText.split("\n")) {
-      const candidate = current ? current + "\n" + line : line;
-      if (candidate.length > maxChars && current) {
-        pages.push(current);
-        current = line;
-      } else {
-        current = candidate;
-      }
-    }
-    if (current) pages.push(current);
-
-    const makeTestContainer = content => new ContainerBuilder()
-      .setAccentColor(getBotPanelAccentColor())
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(content)
-      );
-
-    await commandReply(interaction, {
-      components: [makeTestContainer(pages[0])],
-      flags: MessageFlags.IsComponentsV2,
-      allowedMentions: { parse: [] }
-    });
-
-    for (const page of pages.slice(1)) {
-      await interaction.followUp({
-        components: [makeTestContainer(page)],
-        flags: MessageFlags.IsComponentsV2,
-        allowedMentions: { parse: [] }
-      });
     }
   } else if (interaction.commandName === "send-stock") {
     if (!(await isBotOwner(interaction.user.id))) {
