@@ -3481,9 +3481,6 @@ const commands = [
     .addStringOption(stockTypeOption),
 
   // Server configuration
-  new SlashCommandBuilder().setName("set-stock-channel").setDescription("Choose where automatic stock messages will be posted")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
-    .addChannelOption(option => option.setName("channel").setDescription("Text channel for automatic stock").setRequired(true)),
   new SlashCommandBuilder().setName("set-stock-title").setDescription("Edit the Normal or Mirage stock message title")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addStringOption(stockTypeOption)
@@ -5153,7 +5150,7 @@ client.on("interactionCreate", async interaction => {
       else if (action === "fruit_roles") panel = buildFruitAdminPanel(interaction.guildId);
       else if (action === "servers") panel = buildServerAdminPanel();
       else if (action === "server_channels") {
-        await interaction.reply({ ...guildSettings.buildPanel(interaction.guild), ephemeral: true });
+        await interaction.update(guildSettings.buildPanel(interaction.guild));
         return;
       }
       else return;
