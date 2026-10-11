@@ -17,8 +17,8 @@ const {
 
 const CONFIG_PATH = path.join(__dirname, "config.json");
 const CHANNELS = {
-  welcomeChannelId: "Boas-vindas",
-  goodbyeChannelId: "Saída de membros",
+  welcomeChannelId: "Canal de boas-vindas",
+  goodbyeChannelId: "Canal de saída de membros",
   memberLogChannelId: "Logs de membros",
   messageLogChannelId: "Logs de mensagens",
   moderationLogChannelId: "Logs de moderação",
@@ -26,8 +26,8 @@ const CHANNELS = {
   ticketLogChannelId: "Logs de tickets",
   announcementChannelId: "Anúncios",
   suggestionChannelId: "Sugestões",
-  stockChannelId: "Stock do Blox Fruits (Normal/Mirage)",
-  stockAlertChannelId: "Alertas do Stock do Blox Fruits"
+  stockChannelId: "Stock Blox Fruits (Normal/Mirage)",
+  stockAlertChannelId: "Alertas do Stock Blox Fruits"
 };
 const DEFAULTS = {
   welcomeEnabled: true,
@@ -122,32 +122,36 @@ function panel(guild) {
   return {
     embeds: [new EmbedBuilder()
       .setColor(0x5865F2)
-      .setTitle("<:settings_button:1557204872648982579> CONFIGURAÇÃO DO SERVIDOR")
-      .setDescription("Configure os canais padrão, os logs e os canais especiais do Blox Fruits. Escolha a categoria e depois o canal. As alterações são salvas automaticamente.\n\n" + lines.join("\n"))
+      .setTitle("<:settings_button:1557204872648982579> CANAIS DO SERVIDOR")
+      .setDescription("**Canais de boas-vindas, saída, logs e Blox Fruits**\nSelecione uma categoria abaixo e escolha o canal. As alterações são salvas automaticamente.\n\n" + lines.join("\n"))
       .addFields(
-        { name: "Variáveis da mensagem", value: "`{user}` menção • `{username}` nome • `{server}` servidor • `{memberCount}` total de membros • `{id}` ID" },
-        { name: "Mensagem de boas-vindas", value: safeText(s.welcomeMessage, 900) },
-        { name: "Mensagem de saída", value: safeText(s.goodbyeMessage, 900) }
+        { name: "👋 Boas-vindas", value: "**Canal:** " + (s.welcomeChannelId ? "<#" + s.welcomeChannelId + ">" : "`Não configurado`") + "\n**Status:** " + (s.welcomeEnabled ? "Ativado" : "Desativado"), inline: true },
+        { name: "🚪 Saída", value: "**Canal:** " + (s.goodbyeChannelId ? "<#" + s.goodbyeChannelId + ">" : "`Não configurado`") + "\n**Status:** " + (s.goodbyeEnabled ? "Ativado" : "Desativado"), inline: true },
+        { name: "🧾 Logs", value: ["memberLogChannelId", "messageLogChannelId", "moderationLogChannelId", "serverLogChannelId", "ticketLogChannelId"].map(key => "**" + CHANNELS[key] + ":** " + (s[key] ? "<#" + s[key] + ">" : "`Não configurado`")).join("\n"), inline: false },
+        { name: "🍈 Stock Blox Fruits", value: "**Stock Normal/Mirage:** " + (s.stockChannelId ? "<#" + s.stockChannelId + ">" : "`Não configurado`") + "\n**Alertas de frutas:** " + (s.stockAlertChannelId ? "<#" + s.stockAlertChannelId + ">" : "`Não configurado`"), inline: false },
+        { name: "📢 Outros canais", value: ["announcementChannelId", "suggestionChannelId"].map(key => "**" + CHANNELS[key] + ":** " + (s[key] ? "<#" + s[key] + ">" : "`Não configurado`")).join("\n"), inline: false },
+        { name: "Editar mensagem", value: "**Boas-vindas:** " + safeText(s.welcomeMessage, 500) + "\n**Saída:** " + safeText(s.goodbyeMessage, 500), inline: false },
+        { name: "Variáveis disponíveis", value: "`{user}` menção • `{username}` nome • `{server}` servidor • `{memberCount}` membros • `{id}` ID", inline: false }
       )
-      .setFooter({ text: "ASTRAL BOT • Configuração por servidor" })],
+      .setFooter({ text: "ASTRAL BOT • Canais e mensagens configurados em um só painel" })],
     components: [
       new ActionRowBuilder().addComponents(
-        new StringSelectMenuBuilder().setCustomId("guildcfg:category").setPlaceholder("Escolha qual canal configurar").addOptions(
+        new StringSelectMenuBuilder().setCustomId("guildcfg:category").setPlaceholder("1/2 • Escolha o tipo de canal").addOptions(
           Object.entries(CHANNELS).map(([value, label]) => ({ label, value, description: "Definir canal de " + label.toLowerCase() }))
         )
       ),
       new ActionRowBuilder().addComponents(
-        new ChannelSelectMenuBuilder().setCustomId("guildcfg:channel").setPlaceholder("Selecione o canal para a categoria escolhida").setChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
+        new ChannelSelectMenuBuilder().setCustomId("guildcfg:channel").setPlaceholder("2/2 • Escolha o canal do servidor").setChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
       ),
       new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("guildcfg:edit_welcome").setLabel("Editar boas-vindas").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("guildcfg:edit_goodbye").setLabel("Editar saída").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId("guildcfg:edit_welcome").setLabel("Editar mensagem de boas-vindas").setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId("guildcfg:test_welcome").setLabel("Testar boas-vindas").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("guildcfg:toggle_welcome").setLabel(s.welcomeEnabled ? "Boas-vindas: ON" : "Boas-vindas: OFF").setStyle(s.welcomeEnabled ? ButtonStyle.Success : ButtonStyle.Danger),
-        new ButtonBuilder().setCustomId("guildcfg:toggle_goodbye").setLabel(s.goodbyeEnabled ? "Saída: ON" : "Saída: OFF").setStyle(s.goodbyeEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("guildcfg:toggle_welcome").setLabel(s.welcomeEnabled ? "Boas-vindas: ON" : "Boas-vindas: OFF").setStyle(s.welcomeEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
       ),
       new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("panel:config").setLabel("Voltar às configurações").setEmoji("⬅️").setStyle(ButtonStyle.Secondary)
+        new ButtonBuilder().setCustomId("guildcfg:edit_goodbye").setLabel("Editar mensagem de saída").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId("guildcfg:toggle_goodbye").setLabel(s.goodbyeEnabled ? "Saída: ON" : "Saída: OFF").setStyle(s.goodbyeEnabled ? ButtonStyle.Success : ButtonStyle.Danger),
+        new ButtonBuilder().setCustomId("panel:config").setLabel("Voltar ao painel").setEmoji("⬅️").setStyle(ButtonStyle.Secondary)
       )
     ]
   };
@@ -214,7 +218,7 @@ async function handleInteraction(interaction) {
       if (welcome) { s.welcomeMessage = message; s.welcomeImageUrl = image; }
       else { s.goodbyeMessage = message; s.goodbyeImageUrl = image; }
     });
-    await interaction.reply({ content: "Configuração salva! Abra /config-servidor para conferir.", ephemeral: true });
+    await interaction.reply({ content: "Configuração salva! Volte ao painel Canais do Servidor para conferir.", ephemeral: true });
     return true;
   }
   if (interaction.isButton() && (id === "guildcfg:toggle_welcome" || id === "guildcfg:toggle_goodbye")) {
