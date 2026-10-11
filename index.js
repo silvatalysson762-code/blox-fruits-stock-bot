@@ -3247,14 +3247,14 @@ function buildConfigPanel(guildId) {
         uiEmoji("package", "📦") + " **Canal do Stock:** " + stockChannel + "\n" +
         uiEmoji("alert", "🔔") + " **Canal de Alertas:** " + alertChannel + "\n" +
         "🤖 **Status:** " + (client.ws.status === 0 ? "<:60696:1557204563675848814> Online" : "<:60698:1557204568432185454> Offline") + "\n\n" +
-        "-# Para configurações detalhadas, use os comandos correspondentes."
+        "-# Configure canais, mensagens, logs e stock pelos painéis abaixo, sem precisar de comandos extras."
       )
     )
     .addActionRowComponents(
       new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("panel:servers").setLabel("Servidores autorizados").setEmoji({ name: "60581", id: "1557204878001176586" }).setStyle(ButtonStyle.Secondary),
         new ButtonBuilder().setCustomId("panel:fruit_roles").setLabel("Cargos das frutas").setEmoji(fruitEmojiObject("Dragon")).setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("panel:server_channels").setLabel("Canais e logs").setEmoji("🧾").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId("panel:server_channels").setLabel("Canais, boas-vindas e logs").setEmoji("🧾").setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId("panel:main").setLabel("Voltar").setEmoji({ name: "60578", id: "1557204872648982579" }).setStyle(ButtonStyle.Secondary)
       )
     );
