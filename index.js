@@ -2278,6 +2278,12 @@ function buildMainPanel(guildId, userId) {
               description: "Gerencie os cargos do servidor",
               value: "roles",
               emoji: { name: "user", id: "1557205116849758238" }
+            },
+            {
+              label: "Configuração",
+              description: "Boas-vindas, logs e canais padrão",
+              value: "server_settings",
+              emoji: { name: "60578", id: "1557204872648982579" }
             }
           )
       )
@@ -3437,7 +3443,12 @@ async function getRobloxAvatar(username) {
   return result;
 }
 
+const sales = require("./sales");
+const guildSettings = require("./guild-settings");
+
 const commands = [
+  ...guildSettings.commands,
+  ...sales.commands,
   // General
   new SlashCommandBuilder().setName("stock").setDescription("Show the current Blox Fruits stock")
     .setIntegrationTypes([0, 1]).setContexts([0]),
@@ -3456,12 +3467,7 @@ const commands = [
     .addStringOption(option => option.setName("server_id").setDescription("ID do servidor Discord").setRequired(false).setMinLength(17).setMaxLength(20)),
 
   new SlashCommandBuilder().setName("painel").setDescription("Abrir o painel central do Astral Stock"),
-  new SlashCommandBuilder().setName("suporte").setDescription("Abrir o painel de suporte e tickets")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-
   // Stock tools
-  new SlashCommandBuilder().setName("test-stock").setDescription("Preview all fruits and configured emojis")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
   new SlashCommandBuilder().setName("refresh-stock").setDescription("Fetch and publish the current stock")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
   new SlashCommandBuilder().setName("test-source").setDescription("Testa a fonte pública e mostra o stock consultado")
@@ -3479,19 +3485,10 @@ const commands = [
   new SlashCommandBuilder().setName("set-stock-channel").setDescription("Choose where automatic stock messages will be posted")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addChannelOption(option => option.setName("channel").setDescription("Text channel for automatic stock").setRequired(true)),
-  new SlashCommandBuilder().setName("set-fruit-role").setDescription("Set the role to mention when a fruit appears")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
-    .addStringOption(fruitOption)
-    .addRoleOption(option => option.setName("role").setDescription("Role to mention").setRequired(true)),
   new SlashCommandBuilder().setName("set-stock-title").setDescription("Edit the Normal or Mirage stock message title")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .addStringOption(stockTypeOption)
     .addStringOption(option => option.setName("title").setDescription("New message title").setRequired(true).setMaxLength(100)),
-  new SlashCommandBuilder().setName("list-roles").setDescription("List configured fruit roles")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
-  new SlashCommandBuilder().setName("remove-role").setDescription("Remove a configured fruit role")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
-    .addStringOption(fruitOption),
   new SlashCommandBuilder().setName("fruit-role-panel").setDescription("Send a panel with buttons to receive configured fruit roles")
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
 
@@ -3739,6 +3736,8 @@ client.on("messageCreate", async message => {
 });
 
 client.on("interactionCreate", async interaction => {
+  if (await guildSettings.handleInteraction(interaction)) return;
+  if (await sales.handleInteraction(interaction, client)) return;
   if (interaction.isButton() && /^ticket:member:(add|remove):\d{17,20}$/.test(interaction.customId)) {
     try {
       if (!(await interactionHasTicketStaffRole(interaction))) {
@@ -4889,6 +4888,7 @@ client.on("interactionCreate", async interaction => {
 
       let panel;
       if (action === "config" || action === "stock" || action === "settings" || action === "prices") panel = buildConfigPanel(interaction.guildId);
+      else if (action === "server_settings") panel = guildSettings.buildPanel(interaction.guild);
       else if (action === "fruit_roles") panel = buildFruitAdminPanel(interaction.guildId);
       else if (action === "servers") panel = buildServerAdminPanel();
       else panel = buildMainPanel(interaction.guildId, interaction.user.id);
@@ -5668,20 +5668,7 @@ client.on("interactionCreate", async interaction => {
 
   if (!interaction.isChatInputCommand()) return;
   try {
-  if (interaction.commandName === "suporte") {
-    if (!interaction.guildId) {
-      await commandReply(interaction, { content: "<:offline:1557204568432185454> O painel de suporte só pode ser usado dentro de um servidor.", ephemeral: true });
-      return;
-    }
-    const canManage = await isBotOwner(interaction.user.id) ||
-      Boolean(interaction.member?.permissions?.has?.(PermissionFlagsBits.ManageGuild));
-    if (!canManage) {
-      await commandReply(interaction, { content: "<:offline:1557204568432185454> Você precisa da permissão **Gerenciar Servidor** para publicar o painel de suporte.", ephemeral: true });
-      return;
-    }
-    await commandReply(interaction, buildSupportPanel(interaction.guild));
-    return;
-  } else if (interaction.commandName === "painel") {
+  if (interaction.commandName === "painel") {
     if (!interaction.guildId) {
       await commandReply(interaction, { content: uiEmoji("error", "<:offline:1557204568432185454>") + " O painel só pode ser usado dentro de um servidor.", ephemeral: true });
       return;
@@ -6168,4 +6155,5 @@ client.on("interactionCreate", async interaction => {
     }
   }
 });
+guildSettings.register(client);
 client.login(process.env.DISCORD_TOKEN);

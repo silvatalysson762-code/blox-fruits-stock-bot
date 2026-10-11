@@ -28,18 +28,40 @@ Bot Discord para publicar automaticamente o stock de Blox Fruits, separar Stock 
 - /stock
 - /historico
 
+A configuração e remoção dos cargos de frutas é feita pelo /painel → **Cargos de frutas**. O comando /suporte, os comandos administrativos individuais de cargos de frutas e o comando de teste visual de stock foram removidos.
+
 ### Administração
 - /atualizar
-- /testeestoque
-- /configurar-fruta
 - /configurar-emoji
 - /configurar-titulo
-- /listar-cargos
-- /remover-cargo
 - /listar-emojis
 - /remover-emoji
 
 Os comandos administrativos usam a permissão Gerenciar servidor.
+
+
+## ASTRAL STORE: loja e pedidos por Pix
+
+A loja foi adicionada em `sales.js` e usa `data/sales.json` para salvar produtos, carrinhos e pedidos. O arquivo de dados é criado automaticamente quando o bot executa.
+
+### Configuração inicial
+
+1. Use `/loja-configurar` para cadastrar a chave Pix, nome do titular, link HTTPS direto da imagem do QR Code (opcional) e canal privado de pedidos (opcional).
+2. Use `/loja-staff` para autorizar um cargo a aprovar ou recusar pedidos. Administradores e quem tem Gerenciar servidor também podem administrar a loja.
+3. Cadastre cada item com `/produto-adicionar`: nome, preço em reais, estoque, conteúdo/link de entrega e descrição opcional. Use estoque `-1` para ilimitado.
+4. Use `/loja` para publicar a vitrine no canal desejado.
+5. Use `/produto-listar` para consultar IDs e estoque, `/produto-remover` para tirar um produto da vitrine e `/pedido-pendentes` para revisar pagamentos.
+
+### Fluxo de compra
+
+- O cliente escolhe produtos, define quantidades, revisa o carrinho e cria um pedido.
+- O pedido mostra o valor, a chave Pix em bloco de texto copiável e o QR Code configurado, se houver.
+- O botão **Já paguei** apenas avisa a equipe. Não confirma o pagamento.
+- A equipe deve conferir o recebimento real no aplicativo bancário antes de usar **Confirmar Pix e entregar**. Nunca aprove apenas com base em captura de tela.
+- Após aprovação, o bot desconta o estoque e envia o conteúdo de entrega por mensagem direta. Se a DM falhar, o pedido fica marcado para entrega manual.
+- Pedidos e carrinhos ficam salvos em disco. Faça backup de `data/sales.json` antes de mudanças de hospedagem.
+
+**Importante:** esta é uma integração sem API de pagamentos. A chave Pix e o QR Code são estáticos, o bot não consegue detectar sozinho se o dinheiro caiu e não cria cobranças Pix dinâmicas. Confira o titular e o valor no banco antes de aprovar. Configure somente uma chave Pix que você tem autorização para usar e siga as regras do banco/provedor.
 
 ## Emojis da Application
 
@@ -178,3 +200,15 @@ Os preços em Beli são separados do valor de trade. O bot mostra o preço de co
 ## Atualização
 
 Depois de alterar arquivos no GitHub, faça redeploy/restart da aplicação na Discloud e confira o log antes de testar os comandos.
+
+## Configuração de servidor: boas-vindas, saída e logs
+
+Use `/config-servidor` ou abra `/painel` → **Configuração**. O painel permite definir canais separados para:
+
+- Boas-vindas e saída de membros.
+- Logs de membros, mensagens, moderação e mudanças no servidor.
+- Tickets, anúncios e sugestões (canais de destino).
+
+Os textos de boas-vindas e saída podem usar `{user}`, `{username}`, `{server}`, `{memberCount}` e `{id}`. É possível configurar uma imagem por URL HTTPS e enviar uma prévia de boas-vindas.
+
+As configurações são salvas em `config.json`, dentro da configuração do servidor, e não devem ser commitadas no GitHub. Para logs de mensagens, o bot precisa ter acesso ao canal de logs e às mensagens. Para logs de moderação baseados em eventos de banimento, o bot precisa estar no servidor e ter as permissões necessárias. O canal de tickets é apenas configurável nesta área; eventos internos do sistema de tickets devem continuar sendo registrados pelo próprio módulo de tickets.
