@@ -117,7 +117,9 @@ function panel(guild) {
       new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("guildcfg:edit_welcome").setLabel("Editar boas-vindas").setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId("guildcfg:edit_goodbye").setLabel("Editar saída").setStyle(ButtonStyle.Secondary),
-        new ButtonBuilder().setCustomId("guildcfg:test_welcome").setLabel("Testar boas-vindas").setStyle(ButtonStyle.Success)
+        new ButtonBuilder().setCustomId("guildcfg:test_welcome").setLabel("Testar boas-vindas").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("guildcfg:toggle_welcome").setLabel(s.welcomeEnabled ? "Boas-vindas: ON" : "Boas-vindas: OFF").setStyle(s.welcomeEnabled ? ButtonStyle.Success : ButtonStyle.Danger),
+        new ButtonBuilder().setCustomId("guildcfg:toggle_goodbye").setLabel(s.goodbyeEnabled ? "Saída: ON" : "Saída: OFF").setStyle(s.goodbyeEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
       )
     ]
   };
@@ -190,6 +192,14 @@ async function handleInteraction(interaction) {
       else { s.goodbyeMessage = message; s.goodbyeImageUrl = image; }
     });
     await interaction.reply({ content: "Configuração salva! Abra /config-servidor para conferir.", ephemeral: true });
+    return true;
+  }
+  if (interaction.isButton() && (id === "guildcfg:toggle_welcome" || id === "guildcfg:toggle_goodbye")) {
+    updateSettings(interaction.guildId, settings => {
+      if (id === "guildcfg:toggle_welcome") settings.welcomeEnabled = !settings.welcomeEnabled;
+      else settings.goodbyeEnabled = !settings.goodbyeEnabled;
+    });
+    await interaction.update(panel(interaction.guild));
     return true;
   }
   if (interaction.isButton() && id === "guildcfg:test_welcome") {
