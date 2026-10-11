@@ -3438,8 +3438,10 @@ async function getRobloxAvatar(username) {
 }
 
 const sales = require("./sales");
+const guildSettings = require("./guild-settings");
 
 const commands = [
+  ...guildSettings.commands,
   ...sales.commands,
   // General
   new SlashCommandBuilder().setName("stock").setDescription("Show the current Blox Fruits stock")
@@ -3742,6 +3744,7 @@ client.on("messageCreate", async message => {
 });
 
 client.on("interactionCreate", async interaction => {
+  if (await guildSettings.handleInteraction(interaction)) return;
   if (await sales.handleInteraction(interaction, client)) return;
   if (interaction.isButton() && /^ticket:member:(add|remove):\d{17,20}$/.test(interaction.customId)) {
     try {
@@ -6172,4 +6175,5 @@ client.on("interactionCreate", async interaction => {
     }
   }
 });
+guildSettings.register(client);
 client.login(process.env.DISCORD_TOKEN);
