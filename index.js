@@ -1002,7 +1002,7 @@ const APPLICATION_FRUIT_EMOJIS = {
 
 const APPLICATION_SEMANTIC_EMOJIS = {
   error: "<:offline:1557204568432185454>",
-  success: "<:smoke:1556626973558710342>",
+  success: "<:user_check:1557205120335224933>",
   warning: "<:warning:1557204565877592085>",
   alert: "<:bell:1557204773516611696>",
   package: "<:file:1557204826280951858>",
@@ -1010,24 +1010,24 @@ const APPLICATION_SEMANTIC_EMOJIS = {
   user: "<:user:1557205116849758238>",
   settings: "<a:settings_alt:1557204510651322388>",
   trash: "🗑️",
-  mute: "<:bell:1557204773516611696>",
+  mute: "🔕",
   statistics: "<:chart:1557204890474909799>",
   id: "<:id_card:1557204892177928272>",
   calendar: "<:calendar:1557204788880613437>",
   users: "<:users:1557205137154637864>",
   followers: "<:user_check:1557205120335224933>",
-  arrow: "<:arrow_down:1557204770178211870>",
+  arrow: "➡️",
   lock: "<:lock:1557204840818409482>",
-  key: "<:unlock:1557204844245295194>",
+  key: "🔑",
   bot: "<:discord:1557204573817405440>",
   gem: "<:star:1557205044305072160>",
   money: "<:money_symbol_alt:1557204522009370634>",
   list: "<:clipboard:1557204790843412542>",
-  search: "<:id_card:1557204892177928272>",
+  search: "🔍",
   tools: "<:control_center:1557204878001176586>",
   star: "<:star:1557205044305072160>",
-  fire: "<:warning:1557204565877592085>",
-  sparkle: "<:save:1557205052974960780>"
+  fire: "🔥",
+  sparkle: "✨"
 };
 
 const APPLICATION_SEMANTIC_ALIASES = {
