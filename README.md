@@ -28,14 +28,12 @@ Bot Discord para publicar automaticamente o stock de Blox Fruits, separar Stock 
 - /stock
 - /historico
 
+A configuração e remoção dos cargos de frutas é feita pelo /painel → **Cargos de frutas**. O comando /suporte, os comandos administrativos individuais de cargos de frutas e o comando de teste visual de stock foram removidos.
+
 ### Administração
 - /atualizar
-- /testeestoque
-- /configurar-fruta
 - /configurar-emoji
 - /configurar-titulo
-- /listar-cargos
-- /remover-cargo
 - /listar-emojis
 - /remover-emoji
 
