@@ -3794,6 +3794,7 @@ client.on("interactionCreate", async interaction => {
       if (!member) throw new Error("Não encontrei esse membro neste servidor.");
       const target = interaction.channel;
       if (!target) throw new Error("Não encontrei o canal deste ticket.");
+      await guildSettings.logTicket(interaction.guild, "Ticket fechado", "Canal: " + target.name + " (" + target.id + ")\\nFechado por: <@" + interaction.user.id + ">\\nSolicitante: <@" + ownerId + ">", 0xED4245);
       if (target.isThread?.()) {
         if (action === "add") {
           await target.members.add(memberId);
@@ -3935,6 +3936,9 @@ client.on("interactionCreate", async interaction => {
       }
       const result = await createAstralTicket(interaction, selectedFunction);
       const target = result.target;
+      if (!result.alreadyOpen) {
+        await guildSettings.logTicket(guild, "Ticket criado", "Solicitante: <@" + interaction.user.id + ">\\nCanal: <#" + target.id + ">\\nAtendimento: " + (selectedFunction?.name || "Atendimento"), 0x57F287);
+      }
 
       // Rebuild the original support panel so the selector returns to its placeholder.
       // This also keeps the same panel message instead of sending a second panel.
@@ -4544,6 +4548,9 @@ client.on("interactionCreate", async interaction => {
       }
       const result = await createAstralTicket(interaction);
       const target = result.target;
+      if (!result.alreadyOpen) {
+        await guildSettings.logTicket(guild, "Ticket criado", "Solicitante: <@" + interaction.user.id + ">\\nCanal: <#" + target.id + ">\\nAtendimento: geral", 0x57F287);
+      }
       await interaction.reply({
         content: result.alreadyOpen
           ? "<:online:1557204563675848814> | Você já tem um atendimento aberto!"
