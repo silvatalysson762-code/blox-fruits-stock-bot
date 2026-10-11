@@ -250,6 +250,15 @@ function register(client) {
     const detail = "Canal: <#" + newMessage.channelId + ">\nAutor: " + (newMessage.author?.tag || "desconhecido") + "\nAntes: " + safeText(oldMessage.content || "(não estava em cache)", 1400) + "\nDepois: " + safeText(newMessage.content || "(vazio)", 1400);
     await sendLog(newMessage.guild, "messageLogChannelId", makeEmbed("Mensagem editada", detail, 0xFEE75C));
   });
+  client.on("guildMemberUpdate", async (oldMember, newMember) => {
+    const added = newMember.roles.cache.filter(role => !oldMember.roles.cache.has(role.id)).map(role => "<@&" + role.id + ">");
+    const removed = oldMember.roles.cache.filter(role => !newMember.roles.cache.has(role.id)).map(role => "<@&" + role.id + ">");
+    const changes = [];
+    if (added.length) changes.push("Cargos adicionados: " + added.join(", "));
+    if (removed.length) changes.push("Cargos removidos: " + removed.join(", "));
+    if (oldMember.nickname !== newMember.nickname) changes.push("Apelido: " + (oldMember.nickname || oldMember.user.username) + " → " + (newMember.nickname || newMember.user.username));
+    if (changes.length) await sendLog(newMember.guild, "memberLogChannelId", makeEmbed("Membro atualizado", newMember.user.tag + " (" + newMember.id + ")\\n" + changes.join("\\n"), 0xFEE75C));
+  });
   client.on("channelCreate", channel => {
     if (channel.guild) sendLog(channel.guild, "serverLogChannelId", makeEmbed("Canal criado", channel.name + " (" + channel.id + ")", 0x57F287));
   });
@@ -261,4 +270,4 @@ function register(client) {
   client.on("guildBanAdd", ban => sendLog(ban.guild, "moderationLogChannelId", makeEmbed("Membro banido", ban.user.tag + " (" + ban.user.id + ")", 0xED4245)));
   client.on("guildBanRemove", ban => sendLog(ban.guild, "moderationLogChannelId", makeEmbed("Banimento removido", ban.user.tag + " (" + ban.user.id + ")", 0x57F287)));
 }
-module.exports = { commands, handleInteraction, register };
+module.exports = { commands, handleInteraction, register, buildPanel: panel };
