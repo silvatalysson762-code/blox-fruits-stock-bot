@@ -5970,13 +5970,13 @@ client.on("interactionCreate", async interaction => {
     const roles = getGuildConfig(interaction.guildId).roles || {};
     const entries = Object.entries(roles).filter(([, id]) => /^\d{17,20}$/.test(String(id)));
     const content = entries.map(([fruit, id]) => `• ${fruitEmoji(fruit)} **${fruit}**: <@&${id}>`).join("\n");
-    await commandReply(interaction, { content: content || "Nenhum cargo configurado ainda. Use /configurar-fruta.", ephemeral: true, allowedMentions: { parse: [] } });
+    await commandReply(interaction, { content: content || "Nenhum cargo configurado ainda. Abra /painel → Configuração → Cargos das frutas.", ephemeral: true, allowedMentions: { parse: [] } });
   } else if (interaction.commandName === "fruit-role-panel") {
     const panel = buildFruitRolePanel(interaction.guildId);
 
     if (!panel.configured?.length) {
       await commandReply(interaction, {
-        content: uiEmoji("error", "<:offline:1557204568432185454>") + " Nenhuma fruta possui cargo configurado. Use primeiro **/set-fruit-role**.",
+        content: uiEmoji("error", "<:offline:1557204568432185454>") + " Nenhuma fruta possui cargo configurado. Abra **/painel → Configuração → Cargos das frutas**.",
         ephemeral: true
       });
       return;
