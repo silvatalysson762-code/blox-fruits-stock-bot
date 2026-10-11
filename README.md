@@ -202,3 +202,15 @@ Os preços em Beli são separados do valor de trade. O bot mostra o preço de co
 ## Atualização
 
 Depois de alterar arquivos no GitHub, faça redeploy/restart da aplicação na Discloud e confira o log antes de testar os comandos.
+
+## Configuração de servidor: boas-vindas, saída e logs
+
+Use `/config-servidor` ou abra `/painel` → **Configuração**. O painel permite definir canais separados para:
+
+- Boas-vindas e saída de membros.
+- Logs de membros, mensagens, moderação e mudanças no servidor.
+- Tickets, anúncios e sugestões (canais de destino).
+
+Os textos de boas-vindas e saída podem usar `{user}`, `{username}`, `{server}`, `{memberCount}` e `{id}`. É possível configurar uma imagem por URL HTTPS e enviar uma prévia de boas-vindas.
+
+As configurações são salvas em `config.json`, dentro da configuração do servidor, e não devem ser commitadas no GitHub. Para logs de mensagens, o bot precisa ter acesso ao canal de logs e às mensagens. Para logs de moderação baseados em eventos de banimento, o bot precisa estar no servidor e ter as permissões necessárias. O canal de tickets é apenas configurável nesta área; eventos internos do sistema de tickets devem continuar sendo registrados pelo próprio módulo de tickets.
