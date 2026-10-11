@@ -85,6 +85,11 @@ async function sendLog(guild, key, embed) {
     console.warn("[GUILD SETTINGS] Falha ao enviar log:", error?.message || error);
   }
 }
+
+async function logTicket(guild, title, description, color = 0x5865F2) {
+  if (!guild) return;
+  await sendLog(guild, "ticketLogChannelId", makeEmbed(title, description, color));
+}
 function makeEmbed(title, description, color = 0x5865F2) {
   return new EmbedBuilder().setColor(color).setTitle(title).setDescription(safeText(description, 3900)).setTimestamp();
 }
@@ -280,4 +285,4 @@ function register(client) {
   client.on("guildBanAdd", ban => sendLog(ban.guild, "moderationLogChannelId", makeEmbed("Membro banido", ban.user.tag + " (" + ban.user.id + ")", 0xED4245)));
   client.on("guildBanRemove", ban => sendLog(ban.guild, "moderationLogChannelId", makeEmbed("Banimento removido", ban.user.tag + " (" + ban.user.id + ")", 0x57F287)));
 }
-module.exports = { commands, handleInteraction, register, buildPanel: panel };
+module.exports = { commands, handleInteraction, register, buildPanel: panel, logTicket };
