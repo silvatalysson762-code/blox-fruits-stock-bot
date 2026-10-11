@@ -25,7 +25,9 @@ const CHANNELS = {
   serverLogChannelId: "Logs do servidor",
   ticketLogChannelId: "Logs de tickets",
   announcementChannelId: "Anúncios",
-  suggestionChannelId: "Sugestões"
+  suggestionChannelId: "Sugestões",
+  stockChannelId: "Stock do Blox Fruits (Normal/Mirage)",
+  stockAlertChannelId: "Alertas do Stock do Blox Fruits"
 };
 const DEFAULTS = {
   welcomeEnabled: true,
@@ -51,16 +53,34 @@ function saveConfig(config) {
 function getSettings(guildId) {
   const root = readConfig();
   root.guilds[guildId] = root.guilds[guildId] || {};
-  const settings = { ...DEFAULTS, ...(root.guilds[guildId].serverSettings || {}) };
-  return settings;
+  const guildConfig = root.guilds[guildId];
+  return {
+    ...DEFAULTS,
+    ...(guildConfig.serverSettings || {}),
+    stockChannelId: guildConfig.channelId || guildConfig.serverSettings?.stockChannelId || null,
+    stockAlertChannelId: guildConfig.stockAlertChannelId || guildConfig.serverSettings?.stockAlertChannelId || null
+  };
 }
 function updateSettings(guildId, updater) {
   const root = readConfig();
   root.guilds[guildId] = root.guilds[guildId] || {};
-  root.guilds[guildId].serverSettings = { ...DEFAULTS, ...(root.guilds[guildId].serverSettings || {}) };
-  updater(root.guilds[guildId].serverSettings);
+  const guildConfig = root.guilds[guildId];
+  const settings = {
+    ...DEFAULTS,
+    ...(guildConfig.serverSettings || {}),
+    stockChannelId: guildConfig.channelId || guildConfig.serverSettings?.stockChannelId || null,
+    stockAlertChannelId: guildConfig.stockAlertChannelId || guildConfig.serverSettings?.stockAlertChannelId || null
+  };
+  updater(settings);
+  const stockChannelId = settings.stockChannelId;
+  const stockAlertChannelId = settings.stockAlertChannelId;
+  delete settings.stockChannelId;
+  delete settings.stockAlertChannelId;
+  guildConfig.serverSettings = settings;
+  if (stockChannelId !== undefined) guildConfig.channelId = stockChannelId;
+  if (stockAlertChannelId !== undefined) guildConfig.stockAlertChannelId = stockAlertChannelId;
   saveConfig(root);
-  return root.guilds[guildId].serverSettings;
+  return { ...settings, stockChannelId, stockAlertChannelId };
 }
 function render(template, member) {
   return String(template || "")
@@ -125,17 +145,15 @@ function panel(guild) {
         new ButtonBuilder().setCustomId("guildcfg:test_welcome").setLabel("Testar boas-vindas").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("guildcfg:toggle_welcome").setLabel(s.welcomeEnabled ? "Boas-vindas: ON" : "Boas-vindas: OFF").setStyle(s.welcomeEnabled ? ButtonStyle.Success : ButtonStyle.Danger),
         new ButtonBuilder().setCustomId("guildcfg:toggle_goodbye").setLabel(s.goodbyeEnabled ? "Saída: ON" : "Saída: OFF").setStyle(s.goodbyeEnabled ? ButtonStyle.Success : ButtonStyle.Danger)
+      ),
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId("panel:config").setLabel("Voltar às configurações").setEmoji("⬅️").setStyle(ButtonStyle.Secondary)
       )
     ]
   };
 }
 const selectedCategory = new Map();
-const commands = [
-  new SlashCommandBuilder()
-    .setName("config-servidor")
-    .setDescription("Configura boas-vindas, logs e canais padrão do servidor")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
-];
+const commands = [];
 async function handleInteraction(interaction) {
   if (interaction.isChatInputCommand() && interaction.commandName === "config-servidor") {
     if (!interaction.guild) {
