@@ -2278,6 +2278,12 @@ function buildMainPanel(guildId, userId) {
               description: "Gerencie os cargos do servidor",
               value: "roles",
               emoji: { name: "user", id: "1557205116849758238" }
+            },
+            {
+              label: "Configuração",
+              description: "Boas-vindas, logs e canais padrão",
+              value: "server_settings",
+              emoji: { name: "60578", id: "1557204872648982579" }
             }
           )
       )
@@ -4896,6 +4902,7 @@ client.on("interactionCreate", async interaction => {
 
       let panel;
       if (action === "config" || action === "stock" || action === "settings" || action === "prices") panel = buildConfigPanel(interaction.guildId);
+      else if (action === "server_settings") panel = guildSettings.buildPanel(interaction.guild);
       else if (action === "fruit_roles") panel = buildFruitAdminPanel(interaction.guildId);
       else if (action === "servers") panel = buildServerAdminPanel();
       else panel = buildMainPanel(interaction.guildId, interaction.user.id);
