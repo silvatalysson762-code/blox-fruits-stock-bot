@@ -197,7 +197,7 @@ Depois de alterar arquivos no GitHub, faça redeploy/restart da aplicação na D
 
 ## Configuração de servidor: boas-vindas, saída e logs
 
-Use `/painel` → **Configuração** → **Canais e logs**, ou abra `/config-servidor`. O painel permite definir canais separados para boas-vindas, saída de membros, logs de membros, mensagens, moderação, alterações no servidor, tickets, anúncios e sugestões.
+Use `/painel` → **Configuração** → **Canais e logs**, ou abra `/painel → Configuração → Canais e logs`. O painel permite definir canais separados para boas-vindas, saída de membros, logs de membros, mensagens, moderação, alterações no servidor, tickets, anúncios e sugestões.
 
 Os textos de boas-vindas e saída aceitam `{user}`, `{username}`, `{server}`, `{memberCount}` e `{id}`. Também é possível configurar uma imagem HTTPS, testar uma prévia e ligar/desligar as mensagens.
 
