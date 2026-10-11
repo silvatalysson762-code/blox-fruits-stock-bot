@@ -80,16 +80,11 @@ O código já usa:
 - Beli: <:emoji_232:1556366446257242112>
 - Relógio: <a:emoji_233:1556370328135925931>
 
-## Configuração dos cargos
+## Configuração dos cargos de frutas
 
-1. Ative o Modo Desenvolvedor no Discord.
-2. Copie o ID do cargo.
-3. Faça /configurar-fruta.
-4. Escolha a fruta.
-5. Escolha o cargo.
-6. Deixe o cargo configurado como mencionável no servidor para garantir que a menção seja exibida.
+Use `/painel` → **Configuração** → **Cargos das frutas**. Selecione uma fruta e escolha o cargo no seletor de cargos; para retirar a associação, use **Remover cargo**. Não é necessário configurar as frutas por comandos separados.
 
-O bot usa o ID do cargo, não o nome. Isso evita problemas se o nome do cargo mudar.
+O bot salva o ID do cargo, não o nome. Para mencionar cargos em alertas de stock, confira também as permissões de menção do cargo e do bot.
 
 ## Variáveis de ambiente
 
@@ -169,17 +164,16 @@ O package.json já usa:
 
 node index.js
 
-## Como testar depois de colocar online
+## Como verificar depois de colocar online
 
-1. Confirme no log: Bot conectado como ...
-2. Confirme: Comandos de stock, cargos e emojis registrados.
-3. Use /testeestoque.
-4. Configure um emoji com /configurar-emoji.
-5. Configure um cargo com /configurar-fruta.
-6. Use /stock.
-7. Use /atualizar para forçar uma publicação.
-8. Confira se Normal e Mirage aparecem em mensagens separadas.
-9. Aguarde o próximo reset global para testar a automação.
+1. Confirme nos logs da hospedagem que o bot conectou sem erros.
+2. Confira se os comandos globais foram registrados.
+3. Abra `/painel` e entre em **Configuração** para conferir os canais, logs e cargos de frutas.
+4. Configure os canais de boas-vindas, saída, logs e tickets em **Canais e logs**.
+5. Configure a chave Pix e o canal de pedidos com `/loja-configurar`; cadastre um produto com `/produto-adicionar`.
+6. Publique a vitrine com `/loja` em um canal de teste e faça um pedido de teste sem realizar pagamento real.
+7. Use `/stock` para conferir o último stock salvo.
+8. Confira a execução do workflow **Node.js syntax check** na aba Actions do GitHub antes do deploy.
 
 ## Proteções
 
@@ -203,12 +197,8 @@ Depois de alterar arquivos no GitHub, faça redeploy/restart da aplicação na D
 
 ## Configuração de servidor: boas-vindas, saída e logs
 
-Use `/config-servidor` ou abra `/painel` → **Configuração**. O painel permite definir canais separados para:
+Use `/painel` → **Configuração** → **Canais e logs**, ou abra `/config-servidor`. O painel permite definir canais separados para boas-vindas, saída de membros, logs de membros, mensagens, moderação, alterações no servidor, tickets, anúncios e sugestões.
 
-- Boas-vindas e saída de membros.
-- Logs de membros, mensagens, moderação e mudanças no servidor.
-- Tickets, anúncios e sugestões (canais de destino).
+Os textos de boas-vindas e saída aceitam `{user}`, `{username}`, `{server}`, `{memberCount}` e `{id}`. Também é possível configurar uma imagem HTTPS, testar uma prévia e ligar/desligar as mensagens.
 
-Os textos de boas-vindas e saída podem usar `{user}`, `{username}`, `{server}`, `{memberCount}` e `{id}`. É possível configurar uma imagem por URL HTTPS e enviar uma prévia de boas-vindas.
-
-As configurações são salvas em `config.json`, dentro da configuração do servidor, e não devem ser commitadas no GitHub. Para logs de mensagens, o bot precisa ter acesso ao canal de logs e às mensagens. Para logs de moderação baseados em eventos de banimento, o bot precisa estar no servidor e ter as permissões necessárias. O canal de tickets é apenas configurável nesta área; eventos internos do sistema de tickets devem continuar sendo registrados pelo próprio módulo de tickets.
+O módulo de tickets envia eventos de criação e fechamento ao canal de logs de tickets, se ele estiver configurado. As configurações do servidor ficam em `config.json`; os pedidos e carrinhos da loja ficam em `data/sales.json`. Esses dados locais não devem ser commitados no GitHub.
