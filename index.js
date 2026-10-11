@@ -3437,7 +3437,10 @@ async function getRobloxAvatar(username) {
   return result;
 }
 
+const sales = require("./sales");
+
 const commands = [
+  ...sales.commands,
   // General
   new SlashCommandBuilder().setName("stock").setDescription("Show the current Blox Fruits stock")
     .setIntegrationTypes([0, 1]).setContexts([0]),
@@ -3739,6 +3742,7 @@ client.on("messageCreate", async message => {
 });
 
 client.on("interactionCreate", async interaction => {
+  if (await sales.handleInteraction(interaction, client)) return;
   if (interaction.isButton() && /^ticket:member:(add|remove):\d{17,20}$/.test(interaction.customId)) {
     try {
       if (!(await interactionHasTicketStaffRole(interaction))) {
