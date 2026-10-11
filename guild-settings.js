@@ -102,7 +102,7 @@ function panel(guild) {
   return {
     embeds: [new EmbedBuilder()
       .setColor(0x5865F2)
-      .setTitle("⚙️ CONFIGURAÇÃO DO SERVIDOR")
+      .setTitle("<:settings_button:1557204872648982579> CONFIGURAÇÃO DO SERVIDOR")
       .setDescription("Configure os canais e mensagens do servidor. As alterações são salvas no config.json.\n\n" + lines.join("\n"))
       .addFields(
         { name: "Variáveis da mensagem", value: "`{user}` menção • `{username}` nome • `{server}` servidor • `{memberCount}` total de membros • `{id}` ID" },
