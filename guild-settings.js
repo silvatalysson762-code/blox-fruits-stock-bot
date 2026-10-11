@@ -123,7 +123,7 @@ function panel(guild) {
     embeds: [new EmbedBuilder()
       .setColor(0x5865F2)
       .setTitle("<:settings_button:1557204872648982579> CONFIGURAÇÃO DO SERVIDOR")
-      .setDescription("Configure os canais e mensagens do servidor. As alterações são salvas no config.json.\n\n" + lines.join("\n"))
+      .setDescription("Configure os canais padrão, os logs e os canais especiais do Blox Fruits. Escolha a categoria e depois o canal. As alterações são salvas automaticamente.\n\n" + lines.join("\n"))
       .addFields(
         { name: "Variáveis da mensagem", value: "`{user}` menção • `{username}` nome • `{server}` servidor • `{memberCount}` total de membros • `{id}` ID" },
         { name: "Mensagem de boas-vindas", value: safeText(s.welcomeMessage, 900) },
